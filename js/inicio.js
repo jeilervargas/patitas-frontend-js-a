@@ -26,7 +26,7 @@ window.addEventListener('load', function(){
         ocultarAlerta();
 
         // consumir action del mvc
-        autenticar();
+        autenticar(btnIngresar);
 
     });
 
