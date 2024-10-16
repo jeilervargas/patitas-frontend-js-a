@@ -1,36 +1,35 @@
-window.addEventListener('load', function(){
+window.addEventListener('load',function(){
 
-    // referenciar elementos de la pagina
-    const msgSuccess = this.document.getElementById('msgSuccess');
+    //enviamos mensaje
+    const msgSuccess = this.document.getElementById('mensaje');
 
-    // recuperar nombre del usuario del localStorage
+    //obtenemos info en del localhost
     const result = JSON.parse(this.localStorage.getItem('result'));
-    mostrarAlerta(`Bienvenido ${result.nombreUsuario}`);
 
-    // creamos la variable btnCerrar para el cerrado de sesión
+    mostrarAlerta(result.nombreUsuario, msgSuccess)
     const btnCerrar = this.document.getElementById('btnCerrarSesion');
 
-    btnCerrarSesion.addEventListener('click', function() {
-        cerrarSesion(btnCerrarSesion);
-    }); 
+    btnCerrar.addEventListener('click', function(){
+        //console.log(result);
+        cerrarSesion(result.correoUsuario, msgSuccess)
+    })
+})
 
-});
-
-function mostrarAlerta(mensaje) {
-    msgSuccess.innerHTML = mensaje;
-    msgSuccess.style.display = 'block';
+function mostrarAlerta(mensaje, msg){
+    msg.innerHTML = mensaje;
+    msg.style.display = 'block';
 }
 
-function ocultarAlerta() {
-    msgSuccess.innerHTML = '';
-    msgSuccess.style.display = 'none';
+function ocultarAlerta(msg){
+    msg.innerHTML = '';
+    msg.style.display = 'none';
 }
 
-async function cerrarSesion(boton, msg){
+async function cerrarSesion(email, msg){
+    mostrarAlerta("Cerrando sesión...",msg)
     const url = 'http://localhost:8082/login/close-async';
     const data = {
-        tipoDocumento: localStorage.getItem('tipoDocumento'),
-        numeroDocumento: localStorage.getItem('numeroDocumento')
+        email:email
     };
     try{
         const response = await fetch(url,{
@@ -42,24 +41,22 @@ async function cerrarSesion(boton, msg){
         });
 
         if(!response.ok){
-            mostrarAlerta('Error: No se pudo cerrar la sesión correctamente.');
+            mostrarAlerta('Error! Problema al cerrar sesion');
             throw new Error(`Error: ${response.statusText}`)
         }
 
         const result = await response.json();
-        console.log('Respuesta del servidor', result);
+        console.log('Respuesta del server', result);
 
         if(result.codigo == '00'){
             localStorage.removeItem('result');
-            localStorage.removeItem('tipoDocumento');
-            localStorage.removeItem('numeroDocumento');
             window.location.replace('index.html');
         } else {
             mostrarAlerta(result.mensaje, msg);
         }
 
     }catch (error) {
-        console.error('Error: No se puede cerrar la sesión correctamente.', error)
-        mostrarAlerta('Error: No se puede cerrar la sesión correctamente.', msg)
+        console.error('Error: Problema en el servicio', error)
+        mostrarAlerta('Error: Problema en el servicio', msg)
     }
 }

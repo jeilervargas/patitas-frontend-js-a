@@ -1,87 +1,79 @@
 /**
- * Se ejecuta cuando la página ha cargado completamente (DOM, CSS, JS, Images, etc...)
- * En caso deseas ejecutar el JS a penas se haya cargado el DOM:
- * -> document.addEventListener('DOMContentLoaded', {})
- * -> En la importación del script, agregando el atributo "defer"
+ * Se ejecuta cuando cargue toda la página
+ * En caso solo quieras que sea el DOM:
+ * -> document.addEventListener('DOMContentLoaded',{})
+ * O agregando el atributo "defer" cuando llamas el script
  */
 window.addEventListener('load', function(){
     
-    // referenciar elementos de la pagina
+
+    //referenciar elementos de la pagina
     const tipoDocumento = this.document.getElementById('tipoDocumento');
     const numeroDocumento = this.document.getElementById('numeroDocumento');
     const password = this.document.getElementById('password');
     const btnIngresar = this.document.getElementById('btnIngresar');
-    const msgError = this.document.getElementById('msgError');
-    
-    // implementar listener
+    const msgError = this.document.getElementById('mensaje');
+
+    //implementar listener
     btnIngresar.addEventListener('click', function(){
-        
-        // validar campos de entrada
-        if(tipoDocumento.value === null || tipoDocumento.value.trim() === '' || 
-            numeroDocumento.value === null || numeroDocumento.value.trim() === '' || 
-            password.value === null || password.value.trim() === '') {            
-                mostrarAlerta("Error: Debe completar completamente sus credenciales");
-                return;
+        //validar campos de entrada
+        if(tipoDocumento.value === null || tipoDocumento.value.trim() === '' ||
+        numeroDocumento.value === null || numeroDocumento.value.trim() === '' ||
+        password.value === null || password.value.trim() === '' ){
+            mostrarAlerta('Ingrese todos los datos necesarios', msgError);
+            return;
         }
-        ocultarAlerta();
+    ocultarAlerta(msgError);
 
-        // consumir action del mvc
-        autenticar(btnIngresar);
-
+    autenticar(tipoDocumento.value, numeroDocumento.value, password.value, msgError);
     });
-
 });
 
-function mostrarAlerta(mensaje) {
+function mostrarAlerta(mensaje, msgError){
     msgError.innerHTML = mensaje;
     msgError.style.display = 'block';
 }
 
-function ocultarAlerta() {
+function ocultarAlerta(msgError){
     msgError.innerHTML = '';
     msgError.style.display = 'none';
 }
 
-async function autenticar(){
-    
+async function autenticar(tipoDocumento, numeroDocumento, password, msgError){
     const url = 'http://localhost:8082/login/autenticar-async';
     const data = {
-        tipoDocumento: tipoDocumento.value,
-        numeroDocumento: numeroDocumento.value,
-        password: password.value
+        tipoDocumento:tipoDocumento,
+        numeroDocumento:numeroDocumento,
+        password:password
     };
-
+    //console.log(data);
     try {
-        
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
+            headers:{
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         });
 
-        if(!response.ok) {
-            mostrarAlerta('Error: Ocurrió un problema en la autenticación');
-            throw new Error(`Error: ${response.statusText}`);
+        if(!response.ok){
+            mostrarAlerta('Error: Problema en la autenticacion', msgError);
+            throw new Error(`Error: ${response.statusText}`)
         }
 
-        // validar respuesta
         const result = await response.json();
-        console.log('Respuesta del servidor: ', result);
-        
-        if (result.codigo === '00') {
+        console.log('Respuesta del servidor', result);
+
+        if(result.codigo == '00'){
             localStorage.setItem('result', JSON.stringify(result));
-            window.location.replace('principal.html');
+            window.location.replace('principal.html')
         } else {
-            mostrarAlerta(result.mensaje);
+            mostrarAlerta(result.mensaje, msgError);
         }
+
 
     } catch (error) {
-        
-        console.error('Error: Ocurrió un problema no identificado', error);
-        mostrarAlerta('Error: Ocurrió un problema no identificado');
-
+        console.error('Error: Problema en el servicio', error)
+        mostrarAlerta('Error: Problema en el servicio', msgError)
     }
-
 }
