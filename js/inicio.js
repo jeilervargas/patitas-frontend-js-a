@@ -44,7 +44,7 @@ function ocultarAlerta() {
 
 async function autenticar(){
     
-    const url = 'http://localhost:8082/login/autenticar-async';
+    const url = 'http://localhost:8084/login/autenticar-async';
     const data = {
         tipoDocumento: tipoDocumento.value,
         numeroDocumento: numeroDocumento.value,

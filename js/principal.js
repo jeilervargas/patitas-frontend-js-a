@@ -30,15 +30,16 @@ function cerrarSesion() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            tipoDocumento: JSON.parse(localStorage.getItem('result')).tdoc,
-            numeroDocumento: JSON.parse(localStorage.getItem('result')).ndoc
+            tipoDocumento: JSON.parse(localStorage.getItem('result')).tipoDocumento,
+            numeroDocumento: JSON.parse(localStorage.getItem('result')).numeroDocumento
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.codigo === "00") {
             localStorage.removeItem('result');
-            window.location.replace("indice.html");
+            window.location.href = '/login.html';
+            //window.location.replace("indice.html");
         } else {
             alert("Error al cerrar sesión");
         }
