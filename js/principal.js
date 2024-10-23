@@ -6,6 +6,9 @@ window.addEventListener('load', function(){
     // recuperar nombre del usuario del localStorage
     const result = JSON.parse(this.localStorage.getItem('result'));
     mostrarAlerta(`Bienvenido ${result.nombreUsuario}`);
+    logoutButton.addEventListener('click', function() {
+        cerrarSesion();
+    });
 
 });
 
@@ -17,4 +20,29 @@ function mostrarAlerta(mensaje) {
 function ocultarAlerta() {
     msgSuccess.innerHTML = '';
     msgSuccess.style.display = 'none';
+}
+
+function cerrarSesion() {
+    fetch('http://localhost:8084/login/out-feing', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            tipoDocumento: JSON.parse(localStorage.getItem('result')).tdoc,
+            numeroDocumento: JSON.parse(localStorage.getItem('result')).ndoc
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.codigo === "00") {
+            localStorage.removeItem('result');
+            window.location.replace("indice.html");
+        } else {
+            alert("Error al cerrar sesión");
+        }
+    })
+    .catch(error => {
+        console.error('Error al cerrar sesión:', error);
+    });
 }
