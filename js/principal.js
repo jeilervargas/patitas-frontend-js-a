@@ -2,6 +2,7 @@ window.addEventListener('load', function(){
 
     // referenciar elementos de la pagina
     const msgSuccess = this.document.getElementById('msgSuccess');
+    const logoutButton = document.getElementById('logout');
 
     // recuperar nombre del usuario del localStorage
     const result = JSON.parse(this.localStorage.getItem('result'));
@@ -23,7 +24,7 @@ function ocultarAlerta() {
 }
 
 function cerrarSesion() {
-    fetch('http://localhost:8084/login/out-feing', {
+    fetch('http://localhost:8084/login/out-feign', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
